@@ -1,5 +1,4 @@
-name: Unity Windows BuildAdd commentMore actions
-
+name: Unity Windows
 on:
   push:
     branches:
