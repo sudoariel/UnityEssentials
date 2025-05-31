@@ -10,48 +10,12 @@ on:
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
 jobs:
-  buildWindows:
+  build:
     name: Build for Windows 64-bit
     runs-on: ubuntu-latest # Unity can cross-compile to Windows from Linux
-    strategy:
-      fail-fast: false
     steps:
+      # Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true # Important for Git LFS files
-
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: Library # Path to Unity's Library folder
-          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-Windows-
-
-      - name: Activate Unity License
-        uses: game-ci/unity-actions/activate@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-       
-      - name: Build Unity Project for Windows
-        uses: game-ci/unity-actions/builder@v4
-        with:
-          unityVersion: auto # Tries to detect from ProjectSettings/ProjectVersion.txt, or specify e.g., 2022.3.10f1
-          targetPlatform: StandaloneWindows64
-          buildName: UnityEssentialsBuild 
-        env: # Pass secrets to builder if needed (often activate step is enough)
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Upload Windows Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-StandaloneWindows64 # Name of the artifact on GitHub
-          path: build/StandaloneWindows64/MyGameWindowsBuild 
-          retention-days: 7 # How long to keep the artifact
-
-      - name: Deactivate Unity License
-        if: always() # Ensure this runs even if previous steps fail
-        uses: game-ci/unity-actions/return-license@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
