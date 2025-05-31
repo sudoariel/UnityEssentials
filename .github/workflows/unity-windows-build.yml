@@ -19,3 +19,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true # Important for Git LFS files
+
+      # Cache
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library # Path to Unity's Library folder
+          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Windows-
