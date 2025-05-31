@@ -52,9 +52,11 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
+          buildName: UnityEssentials
 
       # Output
-      - uses: actions/upload-artifact@v3
+      - name: Upload Windows Build Artifact
+      - uses: actions/upload-artifact@v4
         with:
-          name: Build
-          path: build
+          name: build-Windows
+          path: build/StandaloneWindows64
