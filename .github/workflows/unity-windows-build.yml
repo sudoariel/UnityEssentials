@@ -14,17 +14,31 @@ jobs:
     name: Build for Windows 64-bit
     runs-on: ubuntu-latest # Unity can cross-compile to Windows from Linux
     steps:
-      # Checkout
+      # Checkout (without LFS)
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Git LFS
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v3
+        id: lfs-cache
         with:
-          lfs: true # Important for Git LFS files
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
 
       # Cache
-      - name: Cache Unity Library
-        uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
-          path: Library # Path to Unity's Library folder
-          key: Library-Windows-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-Windows-
+            Library-
